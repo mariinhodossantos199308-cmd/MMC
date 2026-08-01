@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Comunidade MMC - Mega Castle Craft Addon</title>
+  
+  <!-- Fontes do Google -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Press+Start+2P&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --mc-gold: #ffc107;
+      --mc-gold-glow: rgba(255, 193, 7, 0.4);
+      --mc-green: #2e7d32;
+      --mc-green-hover: #388e3c;
+      --mc-emerald: #55ff55;
+      --mc-red: #e53935;
+      --mc-blue: #1d9bf0;
+      
+      --bg-glass: rgba(18, 18, 20, 0.90);
+      --bg-card: rgba(26, 26, 30, 0.85);
+      --bg-input: rgba(10, 10, 12, 0.95);
+      --border-color: rgba(255, 255, 255, 0.12);
+      --text-main: #f1f1f5;
+      --text-muted: #9e9ea7;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+    body {
+      color: var(--text-main);
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      background-color: #050505;
+      overflow-x: hidden;
+      display: flex;
+      justify-content: center;
+    }
+
+    .bg-video-container {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      z-index: -2;
+      overflow: hidden;
+    }
+
+    .bg-video {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      filter: blur(14px) brightness(0.28) contrast(1.1);
+      transform: scale(1.08);
+    }
+
+    .bg-overlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: radial-gradient(circle at center, transparent 0%, rgba(0,0,0,0.85) 100%);
+      z-index: -1;
+    }
+
+    .icon { width: 18px; height: 18px; fill: currentColor; display: inline-block; vertical-align: middle; flex-shrink: 0; }
+
+    .app-layout {
+      width: 100%;
+      max-width: 1100px;
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: 25px;
+      padding: 20px;
+      min-height: 100vh;
+    }
+
+    .sidebar {
+      background: var(--bg-glass);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 24px;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      height: fit-content;
+      position: sticky;
+      top: 20px;
+    }
+
+    .brand-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 25px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .brand-title {
+      font-family: 'Press Start 2P', monospace;
+      font-size: 0.75rem;
+      line-height: 1.4;
+      color: var(--mc-gold);
+      text-shadow: 0 0 10px var(--mc-gold-glow);
+    }
+
+    .nav-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+
+    .nav-btn {
+      display: flex; align-items: center; gap: 14px;
+      padding: 12px 16px; border-radius: 10px;
+      color: var(--text-muted); background: transparent;
+      border: none; font-size: 0.95rem; font-weight: 500;
+      cursor: pointer; width: 100%; text-align: left;
+      transition: all 0.2s ease;
+    }
+
+    .nav-btn:hover, .nav-btn.active { background: rgba(255, 255, 255, 0.08); color: #fff; }
+    .nav-btn.active .icon { fill: var(--mc-gold); }
+
+    .addon-info-box {
+      margin-top: 20px;
+      background: rgba(0,0,0,0.4);
+      border: 1px solid rgba(255,193,7,0.2);
+      border-radius: 12px;
+      padding: 12px;
+      font-size: 0.8rem;
+    }
+    .addon-info-title {
+      font-family: 'Press Start 2P', monospace;
+      font-size: 0.6rem;
+      color: var(--mc-emerald);
+      margin-bottom: 6px;
+    }
+
+    .user-card-mini {
+      margin-top: 25px; padding-top: 15px;
+      border-top: 1px solid var(--border-color);
+      display: flex; align-items: center; gap: 12px;
+    }
+
+    .user-avatar-mini { width: 42px; height: 42px; border-radius: 50%; object-fit: cover; border: 2px solid var(--mc-gold); }
+    .user-details-mini { overflow: hidden; }
+    .user-name-mini { font-weight: 600; font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .user-email-mini { font-size: 0.75rem; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    .feed-container { display: flex; flex-direction: column; gap: 20px; padding-bottom: 60px; }
+
+    .feed-tags {
+      display: flex;
+      gap: 10px;
+      overflow-x: auto;
+      padding-bottom: 5px;
+    }
+    .tag-btn {
+      background: var(--bg-glass);
+      border: 1px solid var(--border-color);
+      color: var(--text-muted);
+      padding: 8px 14px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .tag-btn.active, .tag-btn:hover {
+      background: var(--mc-gold);
+      color: #000;
+      font-weight: 600;
+      border-color: var(--mc-gold);
+    }
+
+    .create-post-box {
+      background: var(--bg-glass); border: 1px solid var(--border-color);
+      border-radius: 16px; padding: 20px; backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px); box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+
+    .post-textarea {
+      width: 100%; background: var(--bg-input); border: 1px solid var(--border-color);
+      border-radius: 12px; padding: 14px; color: #fff; font-family: inherit;
+      font-size: 0.95rem; resize: none; min-height: 90px; outline: none; transition: border-color 0.2s;
+    }
+
+    .post-textarea:focus { border-color: var(--mc-gold); }
+
+    .create-post-actions { display: flex; justify-content: space-between; align-items: center; margin-top: 15px; flex-wrap: wrap; gap: 10px; }
+
+    .attach-label {
+      display: inline-flex; align-items: center; gap: 8px;
+      color: var(--text-muted); font-size: 0.85rem; cursor: pointer;
+      padding: 8px 12px; border-radius: 8px; background: rgba(255, 255, 255, 0.05);
+      transition: background 0.2s;
+    }
+
+    .attach-label:hover { background: rgba(255, 255, 255, 0.1); color: #fff; }
+
+    .btn-publish {
+      background: var(--mc-green); color: #fff; border: none; padding: 10px 22px;
+      border-radius: 8px; font-weight: 600; font-size: 0.9rem; cursor: pointer;
+      display: flex; align-items: center; gap: 8px; transition: all 0.2s;
+    }
+
+    .btn-publish:hover { background: var(--mc-green-hover); transform: translateY(-1px); }
+
+    .posts-feed { display: flex; flex-direction: column; gap: 16px; }
+
+    .post-card {
+      background: var(--bg-card); border: 1px solid var(--border-color);
+      border-radius: 16px; padding: 20px; backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px); animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    .post-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+    .author-info { display: flex; align-items: center; gap: 12px; }
+    .author-avatar { width: 44px; height: 44px; border-radius: 50%; object-fit: cover; border: 1px solid var(--border-color); }
+    .author-name { font-weight: 600; font-size: 0.95rem; display: flex; align-items: center; gap: 6px; color: #fff; }
+
+    .author-name.creator { color: var(--mc-gold); text-shadow: 0 0 12px var(--mc-gold-glow); }
+
+    /* Selo de Oficial do Criador */
+    .badge-official {
+      background: linear-gradient(135deg, #ffc107, #ff8f00);
+      color: #000;
+      border-radius: 50%;
+      width: 18px;
+      height: 18px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 8px var(--mc-gold-glow);
+    }
+
+    .badge-role {
+      font-size: 0.65rem;
+      padding: 2px 6px;
+      border-radius: 4px;
+      background: rgba(255,255,255,0.1);
+      color: #aaa;
+      font-family: 'Press Start 2P', monospace;
+    }
+
+    .post-time { font-size: 0.75rem; color: var(--text-muted); }
+    .post-text { font-size: 0.95rem; line-height: 1.6; color: #e1e1e6; word-break: break-word; }
+
+    .post-media {
+      width: 100%; max-height: 420px; object-fit: cover;
+      border-radius: 12px; margin-top: 12px; border: 1px solid var(--border-color);
+    }
+
+    .post-footer {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      margin-top: 15px;
+      padding-top: 12px;
+      border-top: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .btn-like {
+      background: rgba(85, 255, 85, 0.1);
+      border: 1px solid rgba(85, 255, 85, 0.2);
+      color: var(--mc-emerald);
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+    .btn-like.liked {
+      background: rgba(85, 255, 85, 0.3);
+      border-color: var(--mc-emerald);
+    }
+    .btn-like:hover { background: rgba(85, 255, 85, 0.25); }
+
+    .btn-delete {
+      background: transparent; border: none; color: var(--text-muted);
+      cursor: pointer; padding: 6px; border-radius: 6px; transition: all 0.2s;
+    }
+
+    .btn-delete:hover { color: var(--mc-red); background: rgba(229, 57, 53, 0.1); }
+
+    .modal-overlay {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(8px);
+      display: none; justify-content: center; align-items: center;
+      z-index: 1000; padding: 20px;
+    }
+
+    .modal-overlay.active { display: flex; }
+
+    .modal-card {
+      background: #141418; border: 1px solid var(--border-color);
+      border-radius: 18px; max-width: 420px; width: 100%; padding: 28px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+    }
+
+    .modal-title { font-size: 1.1rem; font-weight: 700; margin-bottom: 20px; color: #fff; display: flex; align-items: center; gap: 10px; }
+    .form-group { margin-bottom: 14px; }
+    .form-group label { display: block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 6px; }
+    .form-control { width: 100%; padding: 12px; background: var(--bg-input); border: 1px solid var(--border-color); border-radius: 8px; color: #fff; font-size: 0.9rem; outline: none; }
+    .form-control:focus { border-color: var(--mc-gold); }
+
+    .btn-full { width: 100%; padding: 12px; border-radius: 8px; font-weight: 600; border: none; cursor: pointer; margin-top: 10px; transition: opacity 0.2s; }
+    .btn-full:hover { opacity: 0.9; }
+
+    .auth-toggle { font-size: 0.85rem; color: var(--mc-gold); cursor: pointer; text-align: center; margin-top: 15px; display: block; }
+
+    @media (max-width: 768px) {
+      .app-layout { grid-template-columns: 1fr; padding: 12px; }
+      .sidebar { position: relative; top: 0; padding: 16px; }
+      .nav-list { flex-direction: row; justify-content: space-around; }
+      .nav-btn span { display: none; }
+      .nav-btn { justify-content: center; padding: 10px; }
+      .user-card-mini, .addon-info-box { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Vídeo de Fundo Animado Local -->
+  <div class="bg-video-container">
+    <video class="bg-video" autoplay loop muted playsinline>
+      <source src="bg.mp4" type="video/mp4">
+    </video>
+    <div class="bg-overlay"></div>
+  </div>
+
+  <div class="app-layout">
+    
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="brand-header">
+        <svg class="icon" style="color: var(--mc-gold); width:26px; height:26px;" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+        <span class="brand-title">MEGA CASTLE CRAFT</span>
+      </div>
+
+      <nav>
+        <ul class="nav-list">
+          <li>
+            <button class="nav-btn active">
+              <svg class="icon" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+              <span>Feed da Comunidade</span>
+            </button>
+          </li>
+          <li>
+            <button class="nav-btn" onclick="openAuthModal()">
+              <svg class="icon" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+              <span>Minha Conta</span>
+            </button>
+          </li>
+        </ul>
+      </nav>
+
+      <div class="addon-info-box">
+        <div class="addon-info-title">ADDON BEDROCK</div>
+        <p style="color: var(--text-muted);">Status: <span style="color: var(--mc-emerald);">Online v1.0</span></p>
+        <p style="color: var(--text-muted); margin-top: 4px;">Suporte: Minecraft PE / Bedrock</p>
+      </div>
+
+      <div class="user-card-mini">
+        <img src="User.png" class="user-avatar-mini" alt="Avatar" id="sidebarAvatar">
+        <div class="user-details-mini">
+          <div class="user-name-mini" id="sidebarName">Não Logado</div>
+          <div class="user-email-mini" id="sidebarEmail">Clique em Minha Conta</div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Feed Principal -->
+    <main class="feed-container">
+      
+      <!-- Tags com Ícones Estilizados -->
+      <div class="feed-tags">
+        <button class="tag-btn active" onclick="filterFeed('all', this)">
+          <svg class="icon" viewBox="0 0 24 24"><path d="M4 6h16v2H4zm0 5h16v2H4zm0 5h16v2H4z"/></svg>
+          #Tudo
+        </button>
+        <button class="tag-btn" onclick="filterFeed('construcoes', this)">
+          <svg class="icon" viewBox="0 0 24 24"><path d="M19 21H5V11l7-5 7 5v10zM7 19h10v-7l-5-3.5L7 12v7z"/></svg>
+          #Construções
+        </button>
+        <button class="tag-btn" onclick="filterFeed('news', this)">
+          <svg class="icon" viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14l4 4V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"/></svg>
+          #Addon-News
+        </button>
+        <button class="tag-btn" onclick="filterFeed('duvidas', this)">
+          <svg class="icon" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 16h-2v-2h2v2zm1.07-7.75l-.9.92C12.45 11.9 12 12.5 12 14h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H7c0-2.76 2.24-5 5-5s5 2.24 5 5c0 1.04-.42 1.99-1.07 2.75z"/></svg>
+          #Dúvidas
+        </button>
+      </div>
+
+      <section class="create-post-box">
+        <textarea id="postContent" class="post-textarea" placeholder="Mostre o seu castelo ou tire dúvidas sobre o Addon Mega Castle Craft..."></textarea>
+        
+        <div class="create-post-actions">
+          <label class="attach-label">
+            <svg class="icon" viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
+            Anexar Print / Vídeo
+            <input type="file" id="postMediaInput" accept="image/*,video/*" style="display: none;" onchange="handleFileSelect(event)">
+          </label>
+          <span id="fileNameDisplay" style="font-size: 0.75rem; color: var(--mc-gold);"></span>
+
+          <button class="btn-publish" onclick="submitPost()">
+            Publicar
+            <svg class="icon" viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+          </button>
+        </div>
+      </section>
+
+      <section class="posts-feed" id="feedList"></section>
+    </main>
+
+  </div>
+
+  <!-- Modal de Login/Cadastro -->
+  <div class="modal-overlay" id="authModal">
+    <div class="modal-card">
+      <h3 class="modal-title" id="modalTitle">Entrar na Conta MMC</h3>
+
+      <div class="form-group">
+        <label>Gamertag / Nome do Minecraft:</label>
+        <input type="text" id="authName" class="form-control" placeholder="Ex: GamerMC">
+      </div>
+
+      <div class="form-group">
+        <label>E-mail:</label>
+        <input type="email" id="authEmail" class="form-control" placeholder="seu@email.com">
+      </div>
+
+      <div class="form-group">
+        <label>Senha Secreta:</label>
+        <input type="password" id="authPass" class="form-control" placeholder="••••••••">
+      </div>
+
+      <button class="btn-full" id="btnAuthSubmit" style="background: var(--mc-green); color: #fff;" onclick="handleAuthSubmit()">Entrar</button>
+      <button class="btn-full" style="background: transparent; color: var(--mc-red);" onclick="logoutUser()">Sair da Conta Atual</button>
+      
+      <span class="auth-toggle" id="authToggleText" onclick="toggleAuthMode()">Não tem conta? Cadastre-se aqui</span>
+      <button class="btn-full" style="background: transparent; color: var(--text-muted);" onclick="closeAuthModal()">Cancelar</button>
+    </div>
+  </div>
+
+  <script>
+    function sha256Sync(ascii) {
+      function rightRotate(value, amount) { return (value >>> amount) | (value << (32 - amount)); }
+      var mathPow = Math.pow, maxWord = mathPow(2, 32), lengthProperty = 'length';
+      var i, j, result = '', words = [], asciiBitLength = ascii[lengthProperty] * 8;
+      var hash = sha256Sync.h = sha256Sync.h || [];
+      var k = sha256Sync.k = sha256Sync.k || [];
+      var primeCounter = k[lengthProperty], isComposite = {};
+
+      for (var candidate = 2; primeCounter < 64; candidate++) {
+        if (!isComposite[candidate]) {
+          for (i = 0; i < 300; i += candidate) isComposite[i] = candidate;
+          hash[primeCounter] = (mathPow(candidate, .5) * maxWord) | 0;
+          k[primeCounter++] = (mathPow(candidate, 1/3) * maxWord) | 0;
+        }
+      }
+
+      ascii += '\x80';
+      while (ascii[lengthProperty] % 64 - 56) ascii += '\x00';
+      for (i = 0; i < ascii[lengthProperty]; i++) {
+        j = ascii.charCodeAt(i);
+        if (j >> 8) return;
+        words[i >> 2] |= j << ((3 - i % 4) * 8);
+      }
+      words[words[lengthProperty]] = ((asciiBitLength / maxWord) | 0);
+      words[words[lengthProperty]] = (asciiBitLength);
+
+      for (j = 0; j < words[lengthProperty];) {
+        var w = words.slice(j, j += 16);
+        var oldHash = hash;
+        hash = hash.slice(0, 8);
+        for (i = 0; i < 64; i++) {
+          var w15 = w[i - 15], w2 = w[i - 2];
+          var a = hash[0], e = hash[4];
+          var temp1 = hash[7]
+            + (rightRotate(e, 6) ^ rightRotate(e, 11) ^ rightRotate(e, 25))
+            + ((e & hash[5]) ^ ((~e) & hash[6]))
+            + k[i]
+            + (w[i] = (i < 16) ? w[i] : (
+                w[i - 16]
+                + (rightRotate(w15, 7) ^ rightRotate(w15, 18) ^ (w15 >>> 3))
+                + w[i - 7]
+                + (rightRotate(w2, 17) ^ rightRotate(w2, 19) ^ (w2 >>> 10))
+              ) | 0
+            );
+          var temp2 = (rightRotate(a, 2) ^ rightRotate(a, 13) ^ rightRotate(a, 22))
+            + ((a & hash[1]) ^ (a & hash[2]) ^ (hash[1] & hash[2]));
+
+          hash = [(temp1 + temp2) | 0].concat(hash);
+          hash[4] = (hash[4] + temp1) | 0;
+        }
+        for (i = 0; i < 8; i++) hash[i] = (hash[i] + oldHash[i]) | 0;
+      }
+
+      for (i = 0; i < 8; i++) {
+        for (j = 3; j >= 0; j--) {
+          var b = (hash[i] >> (j * 8)) & 255;
+          result += (b < 16 ? 0 : '') + b.toString(16);
+        }
+      }
+      return result;
+    }
+
+    const CREATOR_NAME_HASH  = "a7f652ee9373d7ec1f1488c0356784d1ee2d744f4ff8aaae86e680a6e35fe8fa";
+    const CREATOR_EMAIL_HASH = "8be2c73eb2366aeefcaecb0a5bf06412e8bcf6d3e8785ed7304df3e6feeb3fae";
+    const CREATOR_PASS_HASH  = "80fbd182d3e1d13dbfb4a36423fa75cd3e8b0ed1d74eaedbc714f36402ec97ee";
+
+    let registeredUsers = JSON.parse(localStorage.getItem('mmc_users_db')) || [];
+    let currentUser = JSON.parse(localStorage.getItem('mmc_user_session')) || null;
+    let postsDatabase = JSON.parse(localStorage.getItem('mmc_posts_db')) || [];
+    
+    let isRegisterMode = false;
+    let selectedMediaBase64 = null;
+    let currentFilter = 'all';
+
+    document.addEventListener('DOMContentLoaded', () => {
+      if (postsDatabase.length === 0) {
+        postsDatabase.push({
+          id: 1001,
+          authorName: 'MegaCastleCreator',
+          authorEmail: 'd1644603@gmail.com',
+          isCreator: true,
+          role: 'DEV ADDON',
+          avatar: 'Dev.png',
+          text: 'Sejam bem-vindos à comunidade oficial do Mega Castle Craft Addon! Compartilhem suas construções e tirem dúvidas.',
+          media: null,
+          likes: [],
+          time: 'Oficial'
+        });
+        savePosts();
+      }
+
+      updateUserUI();
+      renderFeed();
+    });
+
+    function openAuthModal() { document.getElementById('authModal').classList.add('active'); }
+    function closeAuthModal() { document.getElementById('authModal').classList.remove('active'); }
+
+    function toggleAuthMode() {
+      isRegisterMode = !isRegisterMode;
+      document.getElementById('modalTitle').innerText = isRegisterMode ? 'Criar Nova Conta MMC' : 'Entrar na Conta MMC';
+      document.getElementById('btnAuthSubmit').innerText = isRegisterMode ? 'Cadastrar Conta' : 'Entrar';
+      document.getElementById('authToggleText').innerText = isRegisterMode ? 'Já tem conta? Faça Login' : 'Não tem conta? Cadastre-se aqui';
+    }
+
+    function handleAuthSubmit() {
+      const rawName = document.getElementById('authName').value.trim();
+      const rawEmail = document.getElementById('authEmail').value.trim();
+      const rawPass = document.getElementById('authPass').value.trim();
+
+      if (!rawName || !rawEmail || !rawPass) {
+        alert('Por favor, preencha Nome, E-mail e Senha!');
+        return;
+      }
+
+      const inputNameHash  = sha256Sync(rawName.toLowerCase());
+      const inputEmailHash = sha256Sync(rawEmail.toLowerCase());
+      const inputPassHash  = sha256Sync(rawPass);
+
+      const isMatchCreatorName  = (inputNameHash === CREATOR_NAME_HASH);
+      const isMatchCreatorEmail = (inputEmailHash === CREATOR_EMAIL_HASH);
+      const isMatchCreatorPass  = (inputPassHash === CREATOR_PASS_HASH);
+
+      if (isMatchCreatorName || isMatchCreatorEmail) {
+        if (isMatchCreatorName && isMatchCreatorEmail && isMatchCreatorPass) {
+          currentUser = {
+            id: 'creator_master',
+            name: 'MegaCastleCreator',
+            email: 'd1644603@gmail.com',
+            isCreator: true,
+            role: 'DEV ADDON',
+            avatar: 'Dev.png'
+          };
+          localStorage.setItem('mmc_user_session', JSON.stringify(currentUser));
+          alert('Acesso Autorizado! Bem-vindo de volta, Criador.');
+          updateUserUI();
+          renderFeed();
+          closeAuthModal();
+          return;
+        } else {
+          alert('Acesso Negado: As 3 informações codificadas não correspondem à conta oficial do Criador!');
+          return;
+        }
+      }
+
+      if (isRegisterMode) {
+        const userExists = registeredUsers.find(u => 
+          u.nameHash === inputNameHash || u.emailHash === inputEmailHash
+        );
+
+        if (userExists) {
+          alert('Já existe uma conta registrada com este Nome ou E-mail!');
+          return;
+        }
+
+        const newUser = { 
+          id: 'user_' + Date.now(),
+          name: rawName,
+          email: rawEmail,
+          nameHash: inputNameHash,
+          emailHash: inputEmailHash,
+          passHash: inputPassHash, 
+          isCreator: false,
+          role: 'BUILDER',
+          avatar: 'User.png'
+        };
+
+        registeredUsers.push(newUser);
+        localStorage.setItem('mmc_users_db', JSON.stringify(registeredUsers));
+
+        currentUser = { id: newUser.id, name: newUser.name, email: newUser.email, isCreator: false, role: 'BUILDER', avatar: 'User.png' };
+        localStorage.setItem('mmc_user_session', JSON.stringify(currentUser));
+
+        alert('Conta criada com sucesso!');
+        updateUserUI();
+        renderFeed();
+        closeAuthModal();
+
+      } else {
+        const user = registeredUsers.find(u => 
+          u.emailHash === inputEmailHash || u.nameHash === inputNameHash
+        );
+
+        if (!user) {
+          alert('Conta não encontrada! Cadastre-se primeiro.');
+          return;
+        }
+
+        if (user.passHash !== inputPassHash) {
+          alert('Senha incorreta!');
+          return;
+        }
+
+        currentUser = { id: user.id, name: user.name, email: user.email, isCreator: false, role: 'BUILDER', avatar: 'User.png' };
+        localStorage.setItem('mmc_user_session', JSON.stringify(currentUser));
+        updateUserUI();
+        renderFeed();
+        closeAuthModal();
+      }
+    }
+
+    function logoutUser() {
+      currentUser = null;
+      localStorage.removeItem('mmc_user_session');
+      updateUserUI();
+      renderFeed();
+      closeAuthModal();
+    }
+
+    function updateUserUI() {
+      if (currentUser) {
+        document.getElementById('sidebarName').innerText = currentUser.name;
+        document.getElementById('sidebarEmail').innerText = currentUser.email;
+        document.getElementById('sidebarAvatar').src = currentUser.avatar || 'User.png';
+      } else {
+        document.getElementById('sidebarName').innerText = 'Não Logado';
+        document.getElementById('sidebarEmail').innerText = 'Clique em Minha Conta';
+        document.getElementById('sidebarAvatar').src = 'User.png';
+      }
+    }
+
+    function handleFileSelect(e) {
+      const file = e.target.files[0];
+      if (file) {
+        if (file.size > 2.5 * 1024 * 1024) {
+          alert('O arquivo é muito grande! Por favor escolha uma imagem ou vídeo menor que 2.5MB.');
+          e.target.value = '';
+          return;
+        }
+        document.getElementById('fileNameDisplay').innerText = file.name;
+        const reader = new FileReader();
+        reader.onload = function(evt) { selectedMediaBase64 = evt.target.result; };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    function submitPost() {
+      if (!currentUser) {
+        openAuthModal();
+        return;
+      }
+
+      const text = document.getElementById('postContent').value.trim();
+      if (!text && !selectedMediaBase64) {
+        alert('Escreva algo ou anexe uma mídia!');
+        return;
+      }
+
+      const newPost = {
+        id: Date.now(),
+        authorName: currentUser.name,
+        authorEmail: currentUser.email,
+        isCreator: !!currentUser.isCreator,
+        role: currentUser.isCreator ? 'DEV ADDON' : 'DEV ADDON',
+        avatar: currentUser.avatar || (currentUser.isCreator ? 'Dev.png' : 'Dev.png'),
+        text: text,
+        media: selectedMediaBase64,
+        likes: [],
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      };
+
+      postsDatabase.unshift(newPost);
+      savePosts();
+      renderFeed();
+
+      document.getElementById('postContent').value = '';
+      document.getElementById('fileNameDisplay').innerText = '';
+      document.getElementById('postMediaInput').value = '';
+      selectedMediaBase64 = null;
+    }
+
+    function toggleLike(postId) {
+      if (!currentUser) {
+        openAuthModal();
+        return;
+      }
+
+      const post = postsDatabase.find(p => p.id === postId);
+      if (!post) return;
+
+      if (!Array.isArray(post.likes)) post.likes = [];
+
+      const userId = currentUser.id || currentUser.email;
+      const userIndex = post.likes.indexOf(userId);
+
+      if (userIndex === -1) {
+        post.likes.push(userId);
+      } else {
+        post.likes.splice(userIndex, 1);
+      }
+
+      savePosts();
+      renderFeed();
+    }
+
+    function deletePost(id) {
+      const post = postsDatabase.find(p => p.id === id);
+      if (!post) return;
+
+      const canDelete = currentUser && (currentUser.email.toLowerCase() === post.authorEmail.toLowerCase() || currentUser.isCreator);
+
+      if (!canDelete) {
+        alert('Você só pode excluir suas próprias publicações!');
+        return;
+      }
+
+      postsDatabase = postsDatabase.filter(p => p.id !== id);
+      savePosts();
+      renderFeed();
+    }
+
+    function filterFeed(tag, element) {
+      currentFilter = tag;
+      document.querySelectorAll('.tag-btn').forEach(btn => btn.classList.remove('active'));
+      element.classList.add('active');
+      renderFeed();
+    }
+
+    function savePosts() {
+      try {
+        localStorage.setItem('mmc_posts_db', JSON.stringify(postsDatabase));
+      } catch (e) {
+        alert('O armazenamento do navegador está cheio. Tente remover publicações antigas ou mídias pesadas.');
+      }
+    }
+
+    function renderFeed() {
+      const feedList = document.getElementById('feedList');
+      feedList.innerHTML = '';
+
+      const filteredPosts = postsDatabase.filter(post => {
+        if (currentFilter === 'construcoes') return post.text.toLowerCase().includes('castelo') || post.media;
+        if (currentFilter === 'news') return post.isCreator;
+        if (currentFilter === 'duvidas') return post.text.includes('?');
+        return true;
+      });
+
+      filteredPosts.forEach(post => {
+        const canDelete = currentUser && (currentUser.email.toLowerCase() === post.authorEmail.toLowerCase() || currentUser.isCreator);
+        
+        let mediaHtml = '';
+        if (post.media) {
+          if (post.media.startsWith('data:video')) {
+            mediaHtml = `<video src="${post.media}" controls class="post-media"></video>`;
+          } else {
+            mediaHtml = `<img src="${post.media}" class="post-media" alt="Mídia">`;
+          }
+        }
+
+        const likesArray = Array.isArray(post.likes) ? post.likes : [];
+        const likesCount = likesArray.length;
+        const currentUserId = currentUser ? (currentUser.id || currentUser.email) : null;
+        const isLikedByMe = currentUserId && likesArray.includes(currentUserId);
+
+        const card = document.createElement('article');
+        card.className = 'post-card';
+        card.innerHTML = `
+          <header class="post-header">
+            <div class="author-info">
+              <img src="${post.avatar || (post.isCreator ? 'Dev.png' : 'User.png')}" class="author-avatar" alt="Avatar">
+              <div>
+                <div class="author-name ${post.isCreator ? 'creator' : ''}">
+                  ${post.authorName}
+                  
+                  <!-- SELO DE OFICIAL DOURADO EXCLUSIVO DO CRIADOR -->
+                  ${post.isCreator ? `
+                    <span class="badge-official" title="Criador Oficial Mega Castle Craft">
+                      <svg class="icon" style="width:12px; height:12px; fill:#000;" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                    </span>
+                  ` : `
+                    <span class="badge-role">BUILDER</span>
+                  `}
+                </div>
+                <div class="post-time">${post.time}</div>
+              </div>
+            </div>
+
+            ${canDelete ? `
+              <button class="btn-delete" onclick="deletePost(${post.id})" title="Excluir Post">
+                <svg class="icon" viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+              </button>
+            ` : ''}
+          </header>
+
+          <div class="post-text">${post.text}</div>
+          ${mediaHtml}
+
+          <footer class="post-footer">
+            <button class="btn-like ${isLikedByMe ? 'liked' : ''}" onclick="toggleLike(${post.id})">
+              <svg class="icon" style="color: var(--mc-emerald);" viewBox="0 0 24 24"><path d="M12 2L2 9l10 13 10-13-10-7zm0 3.8L18.6 9 12 18.2 5.4 9 12 5.8z"/></svg>
+              <span>${likesCount} Esmeraldas</span>
+            </button>
+          </footer>
+        `;
+
+        feedList.appendChild(card);
+      });
+    }
+  </script>
+
+</body>
+</html>
