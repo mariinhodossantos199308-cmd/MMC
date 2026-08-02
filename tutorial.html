@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Como Instalar - Mega Castle Craft (MCC)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,400;0,700;1,400&family=Press+Start+2P&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --mc-green: #388e3c;
+      --mc-green-hover: #4caf50;
+      --mc-card-bg: rgba(18, 18, 18, 0.92);
+      --mc-border: #444444;
+      --mc-gold: #ffb703;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      color: #f1f1f1;
+      font-family: 'Noto Sans', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 15px;
+      position: relative;
+      background-color: #0d0d0d;
+    }
+
+    .bg-image {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: url('bg.jpg') no-repeat center center / cover;
+      filter: blur(10px) brightness(0.4);
+      transform: scale(1.05);
+      z-index: -1;
+    }
+
+    .mc-container {
+      max-width: 820px;
+      width: 100%;
+      background: var(--mc-card-bg);
+      border: 2px solid var(--mc-border);
+      border-radius: 12px;
+      padding: 40px 30px;
+      backdrop-filter: blur(8px);
+    }
+
+    .header-title {
+      font-family: 'Press Start 2P', monospace;
+      font-size: 1.1rem;
+      color: var(--mc-gold);
+      text-align: center;
+      margin-bottom: 25px;
+      line-height: 1.5;
+    }
+
+    .tutorial-card {
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      padding: 22px;
+      margin-bottom: 25px;
+    }
+
+    .card-title {
+      font-family: 'Press Start 2P', monospace;
+      font-size: 0.85rem;
+      color: var(--mc-green-hover);
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .steps-list {
+      padding-left: 20px;
+      line-height: 1.8;
+      font-size: 0.95rem;
+      color: #ddd;
+    }
+
+    .steps-list li {
+      margin-bottom: 12px;
+    }
+
+    .highlight {
+      color: var(--mc-gold);
+      font-weight: bold;
+    }
+
+    .btn-back {
+      display: inline-block;
+      text-align: center;
+      color: #aaa;
+      text-decoration: none;
+      font-size: 0.9rem;
+      transition: color 0.2s;
+      margin-top: 10px;
+    }
+
+    .btn-back:hover {
+      color: #fff;
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="bg-image"></div>
+
+  <main class="mc-container">
+    <h1 class="header-title">Como Instalar o Addon MCC</h1>
+
+    <!-- Tutorial Celular -->
+    <section class="tutorial-card">
+      <h2 class="card-title">📱 Dispositivos Móveis (Android / iOS)</h2>
+      <ol class="steps-list">
+        <li>Faça o download do arquivo <span class="highlight">MegaCastleCraft.mcaddon</span> na página principal.</li>
+        <li>Abra um gerenciador de arquivos (ex: <span class="highlight">ZArchiver</span>, <span class="highlight">EX File Explorer</span> ou o gerenciador padrão do seu celular).</li>
+        <li>Navegue até a pasta <strong>Downloads</strong> e localize o arquivo baixado.</li>
+        <li>Toque no arquivo (ou toque e segure > escolha a opção <span class="highlight">"Abrir com"</span>).</li>
+        <li>Selecione o aplicativo do <strong>Minecraft</strong> na lista.</li>
+        <li>O jogo será aberto automaticamente e exibirá a mensagem <em>"Importação iniciada..."</em> no topo da tela.</li>
+        <li>Após a importação, crie ou edite um mundo, acesse as opções de <strong>Pacotes de Recursos</strong> e <strong>Pacotes de Comportamento</strong> e ative o addon MCC!</li>
+      </ol>
+    </section>
+
+    <!-- Tutorial PC -->
+    <section class="tutorial-card">
+      <h2 class="card-title">💻 Computador (Windows 10/11)</h2>
+      <ol class="steps-list">
+        <li>Baixe o arquivo <span class="highlight">MegaCastleCraft.mcaddon</span> para o seu PC.</li>
+        <li>Dê dois cliques sobre o arquivo baixado na pasta de downloads.</li>
+        <li>O <strong>Minecraft Bedrock Edition</strong> abrirá automaticamente e iniciará o processo de importação do addon.</li>
+        <li>Entre nas configurações do seu mundo no jogo e ative o pacote em <strong>Pacotes de Recursos</strong> e <strong>Pacotes de Comportamento</strong>.</li>
+      </ol>
+    </section>
+
+    <div style="text-align: center;">
+      <a href="index.html" class="btn-back">← Voltar para a Página Principal</a>
+    </div>
+  </main>
+
+</body>
+</html>
