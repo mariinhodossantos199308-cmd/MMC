@@ -56,6 +56,14 @@
       font-size: 0.85rem;
     }
     textarea { min-height: 140px; }
+    .img-preview {
+      max-width: 150px;
+      max-height: 150px;
+      border-radius: 6px;
+      margin-top: 8px;
+      display: none;
+      border: 1px solid var(--mc-gold);
+    }
     .btn {
       padding: 10px 15px;
       border: none;
@@ -121,12 +129,30 @@
         </select>
       </div>
 
+      <!-- SELEÇÃO DO TIPO DE IMAGEM -->
       <div class="form-group">
-        <label>Imagem (Opcional)</label>
-        <input type="text" id="image" placeholder="Ex: imagens/terra.png">
+        <label>Origem da Imagem (Opcional)</label>
+        <select id="imageType" onchange="toggleImageInput()">
+          <option value="none">Sem Imagem</option>
+          <option value="url">Link da Internet / Pasta Local (URL ou pastas/foto.png)</option>
+          <option value="file">Fazer Upload de Foto do Dispositivo</option>
+        </select>
       </div>
 
-      <div class="form-group">
+      <div class="form-group" id="urlInputContainer" style="display: none;">
+        <label>Link da Imagem / Caminho Local</label>
+        <input type="text" id="imageUrl" placeholder="https://site.com/foto.jpg ou imagens/item.png">
+      </div>
+
+      <div class="form-group" id="fileInputContainer" style="display: none;">
+        <label>Selecione a Imagem do Celular/PC</label>
+        <input type="file" id="imageFile" accept="image/*" onchange="handleFileUpload(event)">
+      </div>
+
+      <img id="preview" class="img-preview" alt="Prévia">
+      <input type="hidden" id="finalImageData">
+
+      <div class="form-group" style="margin-top: 15px;">
         <label>Conteúdo / Explicação</label>
         <textarea id="content" required placeholder="Escreva a explicação do item aqui..."></textarea>
       </div>
@@ -143,6 +169,48 @@
   </div>
 
   <script>
+    function toggleImageInput() {
+      const type = document.getElementById('imageType').value;
+      const urlContainer = document.getElementById('urlInputContainer');
+      const fileContainer = document.getElementById('fileInputContainer');
+      const preview = document.getElementById('preview');
+
+      urlContainer.style.display = type === 'url' ? 'block' : 'none';
+      fileContainer.style.display = type === 'file' ? 'block' : 'none';
+
+      if (type === 'none') {
+        document.getElementById('finalImageData').value = '';
+        preview.style.display = 'none';
+      }
+    }
+
+    // Processa o upload de imagem convertendo para Base64
+    function handleFileUpload(event) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          document.getElementById('finalImageData').value = e.target.result;
+          const preview = document.getElementById('preview');
+          preview.src = e.target.result;
+          preview.style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    document.getElementById('imageUrl').addEventListener('input', (e) => {
+      const url = e.target.value.trim();
+      document.getElementById('finalImageData').value = url;
+      const preview = document.getElementById('preview');
+      if (url) {
+        preview.src = url;
+        preview.style.display = 'block';
+      } else {
+        preview.style.display = 'none';
+      }
+    });
+
     function getArticles() {
       const saved = localStorage.getItem('mcc_wiki_articles');
       return saved ? JSON.parse(saved) : [];
@@ -179,12 +247,20 @@
       e.preventDefault();
       const articles = getArticles();
       const id = document.getElementById('articleId').value;
+      const imageType = document.getElementById('imageType').value;
       
+      let imgData = '';
+      if (imageType === 'url') {
+        imgData = document.getElementById('imageUrl').value;
+      } else if (imageType === 'file' || imageType === 'none') {
+        imgData = document.getElementById('finalImageData').value;
+      }
+
       const newArticle = {
         id: id || Date.now().toString(),
         title: document.getElementById('title').value,
         category: document.getElementById('category').value,
-        image: document.getElementById('image').value,
+        image: imgData,
         content: document.getElementById('content').value
       };
 
@@ -198,6 +274,10 @@
       saveArticles(articles);
       document.getElementById('articleForm').reset();
       document.getElementById('articleId').value = '';
+      document.getElementById('finalImageData').value = '';
+      document.getElementById('preview').style.display = 'none';
+      document.getElementById('imageType').value = 'none';
+      toggleImageInput();
       alert('Artigo salvo com sucesso!');
     });
 
@@ -206,8 +286,26 @@
       document.getElementById('articleId').value = art.id;
       document.getElementById('title').value = art.title;
       document.getElementById('category').value = art.category;
-      document.getElementById('image').value = art.image || '';
       document.getElementById('content').value = art.content;
+
+      const preview = document.getElementById('preview');
+      if (art.image) {
+        document.getElementById('finalImageData').value = art.image;
+        preview.src = art.image;
+        preview.style.display = 'block';
+
+        if (art.image.startsWith('data:image')) {
+          document.getElementById('imageType').value = 'file';
+        } else {
+          document.getElementById('imageType').value = 'url';
+          document.getElementById('imageUrl').value = art.image;
+        }
+      } else {
+        document.getElementById('imageType').value = 'none';
+        preview.style.display = 'none';
+      }
+
+      toggleImageInput();
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
