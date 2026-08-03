@@ -1,15 +1,12 @@
 import os
 from datetime import datetime
 
-# Configurações do projeto
 ADDON_DIR = "Addon"
 OUTPUT_FILE = "MegaCastleCraftUpdates.html"
 
 def obter_arquivos_addon():
-    """Lê a pasta Addon e retorna os arquivos .mcaddon ordenados do mais recente ao mais antigo."""
     if not os.path.exists(ADDON_DIR):
         os.makedirs(ADDON_DIR)
-        print(f"Aviso: Pasta '{ADDON_DIR}' criada. Adicione seus arquivos .mcaddon lá!")
         return []
 
     arquivos = []
@@ -17,7 +14,7 @@ def obter_arquivos_addon():
         if nome_arquivo.endswith(".mcaddon") or nome_arquivo.endswith(".zip") or nome_arquivo.endswith(".mcpack"):
             caminho_completo = os.path.join(ADDON_DIR, nome_arquivo)
             tempo_modificacao = os.path.getmtime(caminho_completo)
-            data_str = datetime.fromtimestamp(tempo_modificacao).strftime('%d/%m/%Y %H:%M')
+            data_str = datetime.fromtimestamp(tempo_modificacao).strftime('%d/%m/%Y')
             arquivos.append({
                 "nome": nome_arquivo,
                 "caminho": f"{ADDON_DIR}/{nome_arquivo}",
@@ -25,7 +22,7 @@ def obter_arquivos_addon():
                 "data": data_str
             })
 
-    # Ordena pelo arquivo modificado mais recentemente (topo)
+    # Ordena do arquivo mais recente para o mais antigo
     arquivos.sort(key=lambda x: x["mtime"], reverse=True)
     return arquivos
 
@@ -44,8 +41,6 @@ def gerar_html_updates():
             e_recente = (idx == 0)
             badge = '<span class="badge badge-latest">Mais Recente</span>' if e_recente else '<span class="badge badge-old">Versão Anterior</span>'
             card_class = "update-card latest" if e_recente else "update-card"
-
-            # Formata um nome visual bonito a partir do arquivo
             nome_versao = item["nome"].replace(".mcaddon", "").replace("_", " ")
 
             cards_html += f"""
@@ -79,7 +74,7 @@ def gerar_html_updates():
             <svg class="icon" viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
             Baixar {item["nome"]}
           </a>
-          <span class="file-info">Arquivo disponível no servidor local</span>
+          <span class="file-info">Download Direto</span>
         </div>
       </article>
 """
@@ -292,8 +287,6 @@ def gerar_html_updates():
 
     with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
         f.write(conteudo_completo)
-
-    print(f"Sucesso! '{OUTPUT_FILE}' foi gerado/atualizado com {len(arquivos)} arquivo(s) da pasta '{ADDON_DIR}'.")
 
 if __name__ == "__main__":
     gerar_html_updates()
