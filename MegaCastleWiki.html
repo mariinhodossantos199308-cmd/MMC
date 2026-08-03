@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mega Castle Wiki - MCC</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;700&family=Press+Start+2P&display=swap" rel="stylesheet">
+  <!-- Biblioteca de Ícones Estilizados (Font Awesome) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --mc-gold: #ffb703;
+      --mc-card-bg: rgba(18, 18, 18, 0.95);
+      --mc-border: #333;
+      --mc-green: #38b000;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      color: #f1f1f1;
+      font-family: 'Noto Sans', sans-serif;
+      background: #0a0a0a;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    header {
+      background: #121212;
+      border-bottom: 2px solid var(--mc-gold);
+      padding: 15px;
+      text-align: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .wiki-title {
+      font-family: 'Press Start 2P', monospace;
+      color: var(--mc-gold);
+      font-size: 1rem;
+      margin-bottom: 12px;
+    }
+    .search-wrapper {
+      position: relative;
+      max-width: 500px;
+      margin: 0 auto;
+    }
+    .search-wrapper i {
+      position: absolute;
+      left: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--mc-gold);
+    }
+    .search-box {
+      width: 100%;
+      padding: 12px 15px 12px 42px;
+      background: #1e1e1e;
+      border: 1px solid var(--mc-gold);
+      border-radius: 20px;
+      color: #fff;
+      font-size: 0.9rem;
+      outline: none;
+    }
+    .container {
+      display: flex;
+      flex: 1;
+      max-width: 1200px;
+      width: 100%;
+      margin: 15px auto;
+      gap: 15px;
+      padding: 0 10px;
+    }
+    aside {
+      width: 250px;
+      background: var(--mc-card-bg);
+      border: 1px solid var(--mc-border);
+      border-radius: 8px;
+      padding: 15px;
+      height: fit-content;
+    }
+    aside h3 {
+      font-family: 'Press Start 2P', monospace;
+      font-size: 0.7rem;
+      color: var(--mc-gold);
+      margin-bottom: 12px;
+      text-transform: uppercase;
+    }
+    .cat-list { list-style: none; }
+    .cat-list li {
+      padding: 10px 12px;
+      cursor: pointer;
+      border-radius: 6px;
+      margin-bottom: 6px;
+      font-size: 0.85rem;
+      background: #141414;
+      border: 1px solid #222;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transition: all 0.2s;
+    }
+    .cat-list li i {
+      color: var(--mc-gold);
+      width: 16px;
+      text-align: center;
+    }
+    .cat-list li.active {
+      background: var(--mc-gold);
+      color: #000;
+      font-weight: bold;
+    }
+    .cat-list li.active i {
+      color: #000;
+    }
+    main {
+      flex: 1;
+      width: 100%;
+    }
+    .category-section {
+      margin-bottom: 30px;
+    }
+    .category-header {
+      font-family: 'Press Start 2P', monospace;
+      font-size: 0.85rem;
+      color: var(--mc-gold);
+      border-bottom: 2px solid var(--mc-gold);
+      padding-bottom: 8px;
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .article-card {
+      background: var(--mc-card-bg);
+      border: 1px solid var(--mc-border);
+      border-left: 4px solid var(--mc-gold);
+      border-radius: 8px;
+      padding: 18px;
+      margin-bottom: 15px;
+      scroll-margin-top: 130px;
+    }
+    .article-title {
+      font-family: 'Press Start 2P', monospace;
+      color: #fff;
+      font-size: 0.85rem;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .article-body {
+      line-height: 1.7;
+      font-size: 0.9rem;
+      color: #ccc;
+      white-space: pre-line;
+    }
+    .article-body img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 6px;
+      margin: 12px 0;
+      border: 1px solid var(--mc-border);
+    }
+    .wiki-link {
+      color: var(--mc-green) !important;
+      text-decoration: underline !important;
+      font-weight: bold;
+      cursor: pointer;
+      padding: 0 2px;
+    }
+    .wiki-link:active {
+      color: #70e000 !important;
+    }
+    .nav-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 10px;
+      color: var(--mc-gold);
+      text-decoration: none;
+      font-size: 0.8rem;
+    }
+    @media (max-width: 768px) {
+      .container { flex-direction: column; }
+      aside { width: 100%; }
+      .cat-list { display: flex; overflow-x: auto; gap: 8px; padding-bottom: 5px; }
+      .cat-list li { white-space: nowrap; margin-bottom: 0; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <a href="index.html" class="nav-btn"><i class="fa-solid fa-arrow-left"></i> Voltar ao Menu Principal</a>
+    <h1 class="wiki-title">Mega Castle Wiki</h1>
+    <div class="search-wrapper">
+      <i class="fa-solid fa-magnifying-glass"></i>
+      <input type="text" id="searchInput" class="search-box" placeholder="Pesquisar item, bioma, bloco...">
+    </div>
+  </header>
+
+  <div class="container">
+    <aside>
+      <h3>Categorias</h3>
+      <ul class="cat-list" id="categoryList">
+        <li class="active" data-cat="all"><i class="fa-solid fa-border-all"></i> Todas</li>
+        <li data-cat="Mobs / Pets"><i class="fa-solid fa-ghost"></i> Mobs & Pets</li>
+        <li data-cat="Biomas & Natureza"><i class="fa-solid fa-tree"></i> Biomas & Natureza</li>
+        <li data-cat="Minérios & Blocos"><i class="fa-solid fa-cube"></i> Minérios & Blocos</li>
+        <li data-cat="Itens & Ferramentas"><i class="fa-solid fa-wand-magic-sparkles"></i> Itens & Ferramentas</li>
+        <li data-cat="Versões & Updates"><i class="fa-solid fa-code-merge"></i> Versões & Updates</li>
+      </ul>
+    </aside>
+
+    <main id="wikiContent">
+      <!-- Conteúdo via JS -->
+    </main>
+  </div>
+
+  <script>
+    function getArticles() {
+      const saved = localStorage.getItem('mcc_wiki_articles');
+      if (saved) return JSON.parse(saved);
+
+      return [
+        { id: "1", title: "Bioma Obscuro", category: "Biomas & Natureza", image: "", content: "O Bioma Obscuro é uma nova região sombria e misteriosa adicionada ao mapa do Mega Castle Craft (MCC).\n\nO solo deste bioma é formado inteiramente por [Terra Obscura](Terra Obscura). Nele cresce a exuberante [Árvore de Durky](Árvore de Durky). Além disso, é o local ideal para encontrar a [Pedra de Símbolo](Pedra de Símbolo) e o raro [Minério de Vignom (Bloco)](Minério de Vignom (Bloco))." },
+        { id: "2", title: "Terra Obscura", category: "Biomas & Natureza", image: "", content: "A Terra Obscura é o bloco nativo que reveste todo o solo do [Bioma Obscuro](Bioma Obscuro).\n\nPossui tom escuro característico e sustenta o crescimento da [Árvore de Durky](Árvore de Durky) e da [Folha de Durky](Folha de Durky). Pode ser coletada para jardinagem e construções temáticas." },
+        { id: "3", title: "Árvore de Durky", category: "Biomas & Natureza", image: "", content: "Árvore nativa que só cresce no solo de [Terra Obscura](Terra Obscura) dentro do [Bioma Obscuro](Bioma Obscuro).\n\nEla fornece [Madeira de Durky](Madeira de Durky) ao ser cortada e possui copas formadas por [Folha de Durky](Folha de Durky)." },
+        { id: "4", title: "Madeira de Durky", category: "Biomas & Natureza", image: "", content: "Tronco nativo obtido ao cortar a [Árvore de Durky](Árvore de Durky).\n\nAo colocar a madeira na bancada de trabalho, você produz a [Tábua de Durky](Tábua de Durky) para construir móveis e estruturas." },
+        { id: "5", title: "Tábua de Durky", category: "Biomas & Natureza", image: "", content: "Tábua refinada processada através da [Madeira de Durky](Madeira de Durky).\n\nÉ usada no artesanato da [Escada de Durky](Escada de Durky), [Laje de Durky](Laje de Durky) e [Porta de Durky](Porta de Durky)." },
+        { id: "6", title: "Escada de Durky", category: "Biomas & Natureza", image: "", content: "Bloco de escada feito com [Tábua de Durky](Tábua de Durky) para dar acesso a andares superiores." },
+        { id: "7", title: "Laje de Durky", category: "Biomas & Natureza", image: "", content: "Meio bloco fabricado a partir da [Tábua de Durky](Tábua de Durky), perfeito para detalhes em tetos e pisos." },
+        { id: "8", title: "Porta de Durky", category: "Biomas & Natureza", image: "", content: "Porta temática e resistente feita com [Tábua de Durky](Tábua de Durky)." },
+        { id: "9", title: "Folha de Durky", category: "Biomas & Natureza", image: "", content: "A folhagem viva encontrada na copa da [Árvore de Durky](Árvore de Durky)." },
+        { id: "10", title: "Minério de Vignom (Bloco)", category: "Minérios & Blocos", image: "", content: "Minério roxo gerado no subsolo e no [Bioma Obscuro](Bioma Obscuro).\n\nAo ser minerado, dropa o [Minério de Vignom (Item)](Minério de Vignom (Item))." },
+        { id: "11", title: "Minério de Vignom (Item)", category: "Minérios & Blocos", image: "", content: "Item bruto obtido da mineração do [Minério de Vignom (Bloco)](Minério de Vignom (Bloco)).\n\nPrecisa ser derretido na fornalha para virar [Barra de Vignom](Barra de Vignom)." },
+        { id: "12", title: "Barra de Vignom", category: "Itens & Ferramentas", image: "", content: "Lingote roxo obtido ao derreter o [Minério de Vignom (Item)](Minério de Vignom (Item)).\n\nUsado para fabricar a [Espada de Vignom](Espada de Vignom), [Picareta de Vignom](Picareta de Vignom), [Machado de Vignom](Machado de Vignom) e o [Bloco de Vignom](Bloco de Vignom)." },
+        { id: "13", title: "Bloco de Vignom", category: "Minérios & Blocos", image: "", content: "Bloco maciço decorativo fabricado unindo 9 unidades de [Barra de Vignom](Barra de Vignom)." },
+        { id: "14", title: "Espada de Vignom", category: "Itens & Ferramentas", image: "", content: "Arma de combate avançada forjada com [Barra de Vignom](Barra de Vignom)." },
+        { id: "15", title: "Picareta de Vignom", category: "Itens & Ferramentas", image: "", content: "Ferramenta de mineração ultra rápida feita com [Barra de Vignom](Barra de Vignom)." },
+        { id: "16", title: "Machado de Vignom", category: "Itens & Ferramentas", image: "", content: "Machado potente feito de [Barra de Vignom](Barra de Vignom) para derrubar a [Árvore de Durky](Árvore de Durky)." },
+        { id: "17", title: "Restos de Vignom", category: "Itens & Ferramentas", image: "", content: "Sobras do processo de mineração do Vignom. Atualmente não possuem utilidade no jogo." },
+        { id: "18", title: "Ghost (Fantasminha)", category: "Mobs / Pets", image: "", content: "Um pet companheiro flutuante que acompanha o jogador durante suas aventuras pelo [Bioma Obscuro](Bioma Obscuro)." },
+        { id: "19", title: "Pedra de Símbolo", category: "Minérios & Blocos", image: "", content: "Blocos de pedra gravados com escritas numéricas que variam de 0 a 6 (Ex: Pedra de Símbolo 0, 1, 2, 3, 4, 5 e 6). Encontrados em construções antigas." },
+        { id: "20", title: "Atualização de Versão (Changelog)", category: "Versões & Updates", image: "", content: "Confira as alterações do addon:\n\n**ADICIONADO (+):**\n• [Ghost (Fantasminha)](Ghost (Fantasminha))\n• [Bioma Obscuro](Bioma Obscuro) e [Terra Obscura](Terra Obscura)\n• [Árvore de Durky](Árvore de Durky), [Madeira de Durky](Madeira de Durky), [Tábua de Durky](Tábua de Durky), [Folha de Durky](Folha de Durky), [Escada de Durky](Escada de Durky), [Laje de Durky](Laje de Durky) e [Porta de Durky](Porta de Durky)\n• [Minério de Vignom (Bloco)](Minério de Vignom (Bloco)), [Minério de Vignom (Item)](Minério de Vignom (Item)), [Barra de Vignom](Barra de Vignom), [Bloco de Vignom](Bloco de Vignom) e [Restos de Vignom](Restos de Vignom)\n• [Espada de Vignom](Espada de Vignom), [Picareta de Vignom](Picareta de Vignom) e [Machado de Vignom](Machado de Vignom)\n• [Pedra de Símbolo](Pedra de Símbolo)\n• Nova textura do Sol (New Texture Sun)\n\n**REMOVIDO (-):**\n• Bloco de Energia\n• Martelo\n• Bússola de Vignom\n• Pato" }
+      ];
+    }
+
+    let selectedCategory = 'all';
+
+    const categoryIcons = {
+      'Mobs / Pets': 'fa-ghost',
+      'Biomas & Natureza': 'fa-tree',
+      'Minérios & Blocos': 'fa-cube',
+      'Itens & Ferramentas': 'fa-wand-magic-sparkles',
+      'Versões & Updates': 'fa-code-merge'
+    };
+
+    function formatWikiLinks(text) {
+      if (!text) return '';
+      return text.replace(/\[(.*?)\]\((.*?)\)/g, (match, label, target) => {
+        return `<span class="wiki-link" onclick="goToArticle('${target}')">${label}</span>`;
+      });
+    }
+
+    function renderWiki(filterText = '') {
+      const articles = getArticles();
+      const main = document.getElementById('wikiContent');
+      main.innerHTML = '';
+
+      const categories = {};
+
+      articles.forEach(art => {
+        const matchesCat = selectedCategory === 'all' || art.category === selectedCategory;
+        const matchesSearch = art.title.toLowerCase().includes(filterText.toLowerCase()) || 
+                              art.content.toLowerCase().includes(filterText.toLowerCase());
+
+        if (matchesCat && matchesSearch) {
+          if (!categories[art.category]) categories[art.category] = [];
+          categories[art.category].push(art);
+        }
+      });
+
+      if (Object.keys(categories).length === 0) {
+        main.innerHTML = '<p style="color:#888; text-align:center; padding: 20px;">Nenhum item encontrado.</p>';
+        return;
+      }
+
+      for (const [catName, artList] of Object.entries(categories)) {
+        const section = document.createElement('div');
+        section.className = 'category-section';
+
+        const iconClass = categoryIcons[catName] || 'fa-folder';
+        let html = `<div class="category-header"><i class="fa-solid ${iconClass}"></i> ${catName}</div>`;
+
+        artList.forEach(art => {
+          const idClean = art.title.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase();
+          html += `
+            <div class="article-card" id="card-${idClean}">
+              <div class="article-title"><i class="fa-solid fa-angle-right" style="color:var(--mc-gold);"></i> ${art.title}</div>
+              ${art.image ? `<img src="${art.image}" alt="${art.title}">` : ''}
+              <div class="article-body">${formatWikiLinks(art.content)}</div>
+            </div>
+          `;
+        });
+
+        section.innerHTML = html;
+        main.appendChild(section);
+      }
+    }
+
+    function goToArticle(targetTitle) {
+      selectedCategory = 'all';
+      document.querySelectorAll('.cat-list li').forEach(li => li.classList.remove('active'));
+      document.querySelector('.cat-list li[data-cat="all"]').classList.add('active');
+      document.getElementById('searchInput').value = '';
+
+      renderWiki();
+
+      const idClean = targetTitle.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase();
+      const targetElement = document.getElementById(`card-${idClean}`);
+
+      if (targetElement) {
+        targetElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        targetElement.style.borderColor = '#38b000';
+        setTimeout(() => { targetElement.style.borderColor = '#333'; }, 2000);
+      }
+    }
+
+    document.getElementById('categoryList').addEventListener('click', (e) => {
+      const targetLi = e.target.closest('li');
+      if (targetLi) {
+        document.querySelectorAll('.cat-list li').forEach(li => li.classList.remove('active'));
+        targetLi.classList.add('active');
+        selectedCategory = targetLi.dataset.cat;
+        renderWiki(document.getElementById('searchInput').value);
+      }
+    });
+
+    document.getElementById('searchInput').addEventListener('input', (e) => {
+      renderWiki(e.target.value);
+    });
+
+    renderWiki();
+  </script>
+</body>
+</html>

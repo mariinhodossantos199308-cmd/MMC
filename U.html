@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Painel de Atualização - MCC</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;700&family=Press+Start+2P&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --mc-green: #388e3c;
+      --mc-green-hover: #4caf50;
+      --mc-green-border: #1b5e20;
+      --mc-card-bg: rgba(18, 18, 18, 0.92);
+      --mc-border: #444444;
+      --mc-gold: #ffb703;
+      --mc-red: #e63946;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      color: #f1f1f1;
+      font-family: 'Noto Sans', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      background-color: #0d0d0d;
+      position: relative;
+    }
+
+    .bg-image {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: url('bg.jpg') no-repeat center center / cover;
+      filter: blur(10px) brightness(0.3);
+      transform: scale(1.05);
+      z-index: -1;
+    }
+
+    .mc-container {
+      max-width: 500px;
+      width: 100%;
+      background: var(--mc-card-bg);
+      border: 2px solid var(--mc-border);
+      border-radius: 12px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.9);
+      padding: 35px 25px;
+      backdrop-filter: blur(8px);
+      text-align: center;
+    }
+
+    .logo {
+      max-width: 220px;
+      width: 100%;
+      height: auto;
+      margin-bottom: 20px;
+      filter: drop-shadow(0 6px 8px rgba(0,0,0,0.8));
+    }
+
+    .title {
+      font-family: 'Press Start 2P', monospace;
+      font-size: 0.85rem;
+      color: var(--mc-gold);
+      margin-bottom: 15px;
+      text-transform: uppercase;
+    }
+
+    .description {
+      font-size: 0.88rem;
+      color: #ccc;
+      margin-bottom: 25px;
+      line-height: 1.5;
+    }
+
+    .mc-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      background: linear-gradient(180deg, var(--mc-green-hover) 0%, var(--mc-green) 100%);
+      color: #ffffff;
+      font-family: 'Press Start 2P', monospace;
+      font-size: 0.75rem;
+      padding: 18px 24px;
+      border-radius: 6px;
+      border: none;
+      border-bottom: 5px solid var(--mc-green-border);
+      box-shadow: 0 8px 20px rgba(56, 142, 60, 0.4);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      width: 100%;
+      text-shadow: 1px 1px 3px rgba(0,0,0,0.8);
+    }
+
+    .mc-button:hover {
+      background: linear-gradient(180deg, #5cba60 0%, #43a047 100%);
+      transform: translateY(-2px);
+    }
+
+    .mc-button:active {
+      transform: translateY(2px);
+      border-bottom-width: 2px;
+    }
+
+    .mc-button:disabled {
+      background: #555;
+      border-bottom-color: #333;
+      cursor: not-allowed;
+      box-shadow: none;
+      opacity: 0.7;
+    }
+
+    .status-box {
+      margin-top: 20px;
+      padding: 12px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      display: none;
+      text-align: left;
+      white-space: pre-wrap;
+    }
+
+    .status-box.success {
+      display: block;
+      background: rgba(56, 142, 60, 0.2);
+      border: 1px solid var(--mc-green);
+      color: #81c784;
+    }
+
+    .status-box.error {
+      display: block;
+      background: rgba(230, 57, 70, 0.2);
+      border: 1px solid var(--mc-red);
+      color: #e57373;
+    }
+
+    .icon {
+      width: 18px; height: 18px; fill: currentColor;
+    }
+
+    .links {
+      margin-top: 25px;
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+    }
+
+    .links a {
+      color: #aaa;
+      font-size: 0.8rem;
+      text-decoration: none;
+    }
+
+    .links a:hover {
+      color: var(--mc-gold);
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="bg-image"></div>
+
+  <main class="mc-container">
+    <img src="logo.png" alt="Logo Mega Castle Craft" class="logo">
+    <h1 class="title">Gerenciador de Updates</h1>
+    
+    <p class="description">
+      Clique no botão abaixo após adicionar novos arquivos na pasta <strong>/Addon</strong> para atualizar a página de updates.
+    </p>
+
+    <button id="updateBtn" class="mc-button">
+      <svg class="icon" viewBox="0 0 24 24"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
+      ATUALIZAR PÁGINA DE UPDATES
+    </button>
+
+    <div id="statusBox" class="status-box"></div>
+
+    <div class="links">
+      <a href="MegaCastleCraftUpdates.html" target="_blank">Ver Updates →</a>
+      <a href="index.html">Ir para o Início →</a>
+    </div>
+  </main>
+
+  <script>
+    const updateBtn = document.getElementById('updateBtn');
+    const statusBox = document.getElementById('statusBox');
+
+    updateBtn.addEventListener('click', async () => {
+      // Bloqueia o botão e avisa que está atualizando
+      updateBtn.disabled = true;
+      updateBtn.innerText = 'ATUALIZANDO...';
+      statusBox.className = 'status-box';
+      statusBox.style.display = 'none';
+
+      try {
+        const response = await fetch('/executar-update', { method: 'POST' });
+        const data = await response.json();
+
+        if (response.ok && data.status === 'sucesso') {
+          statusBox.className = 'status-box success';
+          statusBox.innerText = '✔ ' + data.mensagem + '\n' + (data.detalhes || '');
+        } else {
+          statusBox.className = 'status-box error';
+          statusBox.innerText = '✖ ' + data.mensagem + '\n' + (data.detalhes || '');
+        }
+      } catch (err) {
+        statusBox.className = 'status-box error';
+        statusBox.innerText = '✖ Erro de conexão. Certifique-se de que o servidor Python (servidor.py) está rodando.';
+      } finally {
+        updateBtn.disabled = false;
+        updateBtn.innerHTML = `
+          <svg class="icon" viewBox="0 0 24 24"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
+          ATUALIZAR PÁGINA DE UPDATES
+        `;
+      }
+    });
+  </script>
+</body>
+</html>

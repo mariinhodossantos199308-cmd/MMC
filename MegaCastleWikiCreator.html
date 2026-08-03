@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Criador/Editor Wiki - MCC</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;700&family=Press+Start+2P&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --mc-gold: #ffb703;
+      --mc-border: #333;
+      --mc-red: #d90429;
+      --mc-green: #38b000;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      color: #f1f1f1;
+      font-family: 'Noto Sans', sans-serif;
+      background: #0a0a0a;
+      padding: 15px;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: #121212;
+      border: 2px solid var(--mc-gold);
+      border-radius: 8px;
+      padding: 20px;
+    }
+    h1 {
+      font-family: 'Press Start 2P', monospace;
+      color: var(--mc-gold);
+      font-size: 0.9rem;
+      margin-bottom: 15px;
+      text-align: center;
+    }
+    .guide {
+      background: #1a1a1a;
+      border-left: 3px solid var(--mc-gold);
+      padding: 10px;
+      font-size: 0.8rem;
+      margin-bottom: 15px;
+      line-height: 1.4;
+    }
+    .guide code { color: var(--mc-green); }
+    .form-group { margin-bottom: 12px; }
+    label { display: block; margin-bottom: 4px; font-weight: bold; font-size: 0.8rem; }
+    input, select, textarea {
+      width: 100%;
+      padding: 10px;
+      background: #1e1e1e;
+      border: 1px solid var(--mc-border);
+      border-radius: 6px;
+      color: #fff;
+      font-size: 0.85rem;
+    }
+    textarea { min-height: 140px; }
+    .btn {
+      padding: 10px 15px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 0.85rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    .btn-green { background: var(--mc-green); color: #fff; width: 100%; }
+    .btn-red { background: var(--mc-red); color: #fff; }
+    .article-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #181818;
+      border: 1px solid #222;
+      padding: 10px;
+      margin-bottom: 8px;
+      border-radius: 6px;
+    }
+    .nav-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 15px;
+      color: var(--mc-gold);
+      text-decoration: none;
+      font-size: 0.8rem;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <a href="MegaCastleWiki.html" class="nav-btn"><i class="fa-solid fa-eye"></i> Ver a Wiki Funcionando</a>
+    <h1>Editor da Wiki</h1>
+
+    <div class="guide">
+      <i class="fa-solid fa-link" style="color:var(--mc-gold);"></i> <strong>Link Verde:</strong> <code>[Texto do Link](Nome Exato do Item)</code><br>
+      Exemplo: <i>O [Bioma Obscuro](Bioma Obscuro) possui [Terra Obscura](Terra Obscura).</i>
+    </div>
+
+    <form id="articleForm">
+      <input type="hidden" id="articleId">
+      
+      <div class="form-group">
+        <label>Título</label>
+        <input type="text" id="title" required placeholder="Ex: Terra Obscura">
+      </div>
+
+      <div class="form-group">
+        <label>Categoria</label>
+        <select id="category">
+          <option value="Mobs / Pets">Mobs & Pets</option>
+          <option value="Biomas & Natureza">Biomas & Natureza</option>
+          <option value="Minérios & Blocos">Minérios & Blocos</option>
+          <option value="Itens & Ferramentas">Itens & Ferramentas</option>
+          <option value="Versões & Updates">Versões & Updates</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Imagem (Opcional)</label>
+        <input type="text" id="image" placeholder="Ex: imagens/terra.png">
+      </div>
+
+      <div class="form-group">
+        <label>Conteúdo / Explicação</label>
+        <textarea id="content" required placeholder="Escreva a explicação do item aqui..."></textarea>
+      </div>
+
+      <button type="submit" class="btn btn-green"><i class="fa-solid fa-floppy-disk"></i> Salvar na Wiki</button>
+    </form>
+
+    <div style="margin-top: 25px;">
+      <h2 style="font-size:0.9rem; margin-bottom:10px; color:var(--mc-gold); display:flex; align-items:center; gap:8px;">
+        <i class="fa-solid fa-list-check"></i> Itens Salvos na Wiki
+      </h2>
+      <div id="articlesContainer"></div>
+    </div>
+  </div>
+
+  <script>
+    function getArticles() {
+      const saved = localStorage.getItem('mcc_wiki_articles');
+      return saved ? JSON.parse(saved) : [];
+    }
+
+    function saveArticles(articles) {
+      localStorage.setItem('mcc_wiki_articles', JSON.stringify(articles));
+      renderList();
+    }
+
+    function renderList() {
+      const articles = getArticles();
+      const container = document.getElementById('articlesContainer');
+      container.innerHTML = '';
+
+      articles.forEach((art, index) => {
+        const item = document.createElement('div');
+        item.className = 'article-item';
+        item.innerHTML = `
+          <div>
+            <strong>${art.title}</strong><br>
+            <small style="color:#888;">${art.category}</small>
+          </div>
+          <div style="display:flex; gap:5px;">
+            <button type="button" onclick="editArticle(${index})" class="btn" style="background:#333; color:#fff; padding:6px 10px;"><i class="fa-solid fa-pen-to-square"></i></button>
+            <button type="button" onclick="deleteArticle(${index})" class="btn btn-red" style="padding:6px 10px;"><i class="fa-solid fa-trash"></i></button>
+          </div>
+        `;
+        container.appendChild(item);
+      });
+    }
+
+    document.getElementById('articleForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const articles = getArticles();
+      const id = document.getElementById('articleId').value;
+      
+      const newArticle = {
+        id: id || Date.now().toString(),
+        title: document.getElementById('title').value,
+        category: document.getElementById('category').value,
+        image: document.getElementById('image').value,
+        content: document.getElementById('content').value
+      };
+
+      if (id !== '') {
+        const index = articles.findIndex(a => a.id === id);
+        if (index !== -1) articles[index] = newArticle;
+      } else {
+        articles.push(newArticle);
+      }
+
+      saveArticles(articles);
+      document.getElementById('articleForm').reset();
+      document.getElementById('articleId').value = '';
+      alert('Artigo salvo com sucesso!');
+    });
+
+    function editArticle(index) {
+      const art = getArticles()[index];
+      document.getElementById('articleId').value = art.id;
+      document.getElementById('title').value = art.title;
+      document.getElementById('category').value = art.category;
+      document.getElementById('image').value = art.image || '';
+      document.getElementById('content').value = art.content;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function deleteArticle(index) {
+      if (confirm('Deseja excluir este artigo da Wiki?')) {
+        const articles = getArticles();
+        articles.splice(index, 1);
+        saveArticles(articles);
+      }
+    }
+
+    renderList();
+  </script>
+</body>
+</html>
